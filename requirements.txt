@@ -1,7 +1,7 @@
 blinker==1.6.3
 click==8.1.7
 flash==1.0.3
-Flask==3.0.0
+Flask==2.2.5
 Flask-SQLAlchemy==3.1.1
 greenlet==3.0.1
 gunicorn==21.2.0
