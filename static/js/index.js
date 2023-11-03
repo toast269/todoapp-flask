@@ -18,12 +18,3 @@ const greetBox1 = document.createElement("h2");
 greetBox1.innerHTML =
   "This TodoApp is Made with &hearts; by KAUSTAV <br> Thanks for Visiting &#128516;";
 div1.appendChild(greetBox1);
-
-document.getElementById("myForm").addEventListener("submit", function (event) {
-  var input = document.getElementById("myInput");
-
-  if (input.value.trim() === "") {
-    alert("Input cannot be blank");
-    event.preventDefault(); // Prevent form submission
-  }
-});

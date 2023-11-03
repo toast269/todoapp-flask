@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///todo.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
 db = SQLAlchemy(app)
 
 class Todo(db.Model):
@@ -11,17 +13,60 @@ class Todo(db.Model):
     title = db.Column(db.String(200), nullable=False)
     desc = db.Column(db.String(500), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self) -> str:
         return f"{self.sno} - {self.title} \n"
+    
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(155), unique=True, nullable=False)
+    passwd = db.Column(db.String(155), nullable=False)
+    notes = db.relationship('Todo')
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
+    if request.method == "POST":
+        username = request.form.get('username')
+        passwd = request.form.get('passwd')
+        return render_template('/')
     return render_template('login.html')
 
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == "POST":
+        email = request.form.get('email')
+        username = request.form.get('username')
+        passwd_set = request.form.get('passwd_set')
+        passwd_confirm = request.form.get('passwd_confirm')
+
+        if len(email) < 4 and ["@", ".com"] not in email:
+            flash("Invalid Email", category='error')
+        elif len(username) < 3:
+            flash("Username cannot be less than 3 characters", category='error')
+        elif len(passwd_set) < 8:
+            flash("Password cannot be leass than 8 characters", category='error')
+        elif passwd_set != passwd_confirm:
+            flash("Passwords don't match", category='error')
+        else:
+            new_user = User(email=email, username=username, passwd=generate_password_hash(passwd_set, method='sha256'))
+            db.session.add(new_user)
+            db.session.commit()
+            flash("Account Created Successfully", category='success')
+            return redirect('/')
+
+    return render_template('register.html')
+
+
+@app.route('/')
 def index():
+    return render_template('home.html')
+
+
+@app.route('/home', methods=["GET", "POST"])
+def home():
     if request.method=="POST":
         todo = Todo(title=request.form['title'], desc=request.form['desc'])
         db.session.add(todo)
@@ -53,4 +98,4 @@ def update(sno):
     return render_template('update.html', todo=todo)
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True)
