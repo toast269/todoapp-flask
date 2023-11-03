@@ -15,6 +15,11 @@ class Todo(db.Model):
     def __repr__(self) -> str:
         return f"{self.sno} - {self.title} \n"
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    return render_template('login.html')
+
+
 @app.route('/', methods=["GET", "POST"])
 def index():
     if request.method=="POST":
