@@ -22,6 +22,7 @@
                         type="text"
                         id="form3Example1c"
                         class="form-control"
+                        name="username"
                       />
                     </div>
                   </div>
@@ -36,6 +37,7 @@
                         type="email"
                         id="form3Example3c"
                         class="form-control"
+                        name="email-id"
                       />
                     </div>
                   </div>
@@ -50,6 +52,7 @@
                         type="password"
                         id="form3Example4c"
                         class="form-control"
+                        name="password"
                       />
                     </div>
                   </div>
@@ -64,6 +67,7 @@
                         type="password"
                         id="form3Example4cd"
                         class="form-control"
+                        name="confirm-password"
                       />
                     </div>
                   </div>
@@ -72,6 +76,7 @@
                     <button
                       type="submit"
                       class="btn btn-outline-primary btn-lg"
+                      id="register-button"
                     >
                       Register
                     </button>
@@ -94,4 +99,5 @@
     </div>
   </div>
 </section>
+<script src="{{ url_for('static', filename='js/popup.js') }}"></script>
 {% endblock body %}

@@ -6,6 +6,8 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+app.config['SECRET_KEY'] = "ThisIsAVerySecretKey"
+
 db = SQLAlchemy(app)
 
 class Todo(db.Model):
@@ -20,7 +22,7 @@ class Todo(db.Model):
     
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(155), unique=True, nullable=False)
+    username = db.Column(db.String(155), unique=True, nullable=False)
     passwd = db.Column(db.String(155), nullable=False)
     notes = db.relationship('Todo')
 
@@ -36,26 +38,27 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    render_template('register.html')
     if request.method == "POST":
-        email = request.form.get('email')
-        username = request.form.get('username')
-        passwd_set = request.form.get('passwd_set')
-        passwd_confirm = request.form.get('passwd_confirm')
+        email = str(request.form.get('email-id'))
+        username = str(request.form.get('username'))
+        passwd_set = str(request.form.get('password'))
+        passwd_confirm = request.form.get('confirm-password')
 
         if len(email) < 4 and ["@", ".com"] not in email:
             flash("Invalid Email", category='error')
-        elif len(username) < 3:
+        if len(username) < 3:
             flash("Username cannot be less than 3 characters", category='error')
-        elif len(passwd_set) < 8:
+        if len(passwd_set) < 8:
             flash("Password cannot be leass than 8 characters", category='error')
-        elif passwd_set != passwd_confirm:
+        if passwd_set != passwd_confirm:
             flash("Passwords don't match", category='error')
         else:
-            new_user = User(email=email, username=username, passwd=generate_password_hash(passwd_set, method='sha256'))
+            new_user = User(username=username, passwd=generate_password_hash(passwd_set, method='sha256'))
             db.session.add(new_user)
             db.session.commit()
             flash("Account Created Successfully", category='success')
-            return redirect('/')
+            return redirect('/login')
 
     return render_template('register.html')
 
